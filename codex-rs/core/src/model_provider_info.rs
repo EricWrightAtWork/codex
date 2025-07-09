@@ -64,6 +64,8 @@ pub struct ModelProviderInfo {
     /// value should be used. If the environment variable is not set, or the
     /// value is empty, the header will not be included in the request.
     pub env_http_headers: Option<HashMap<String, String>>,
+
+    pub auth_header_name: Option<String>,
 }
 
 impl ModelProviderInfo {
@@ -85,11 +87,14 @@ impl ModelProviderInfo {
 
         let mut builder = client.post(url);
         if let Some(key) = api_key {
-        //     builder = builder.bearer_auth(key);
-            builder = builder.header("api-key", key);
+            builder = builder.bearer_auth(key)
+            // if let Some(auth_header_name) = &self.auth_header_name {
+            //     builder = builder.header(auth_header_name, key)
+            // } else {
+            //     builder = builder.bearer_auth(key)
+            // };
         }
         
-
         Ok(self.apply_http_headers(builder))
     }
 
@@ -207,6 +212,7 @@ pub fn built_in_model_providers() -> HashMap<String, ModelProviderInfo> {
                         .into_iter()
                         .collect(),
                 ),
+                auth_header_name: None,
             },
         ),
     ]
@@ -236,6 +242,7 @@ base_url = "http://localhost:11434/v1"
             query_params: None,
             http_headers: None,
             env_http_headers: None,
+            auth_header_name: None,
         };
 
         let provider: ModelProviderInfo = toml::from_str(azure_provider_toml).unwrap();
@@ -261,6 +268,7 @@ query_params = { api-version = "2025-04-01-preview" }
             }),
             http_headers: None,
             env_http_headers: None,
+            auth_header_name: None,
         };
 
         let provider: ModelProviderInfo = toml::from_str(azure_provider_toml).unwrap();
@@ -289,6 +297,7 @@ env_http_headers = { "X-Example-Env-Header" = "EXAMPLE_ENV_VAR" }
             env_http_headers: Some(maplit::hashmap! {
                 "X-Example-Env-Header".to_string() => "EXAMPLE_ENV_VAR".to_string(),
             }),
+            auth_header_name: None,
         };
 
         let provider: ModelProviderInfo = toml::from_str(azure_provider_toml).unwrap();
