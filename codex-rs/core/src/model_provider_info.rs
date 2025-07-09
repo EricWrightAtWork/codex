@@ -85,8 +85,10 @@ impl ModelProviderInfo {
 
         let mut builder = client.post(url);
         if let Some(key) = api_key {
-            builder = builder.bearer_auth(key);
+        //     builder = builder.bearer_auth(key);
+            builder = builder.header("api-key", key);
         }
+        
 
         Ok(self.apply_http_headers(builder))
     }
